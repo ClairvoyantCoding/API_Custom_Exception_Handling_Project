@@ -1,0 +1,34 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'io.franzbecker.gradle-lombok' version '4.0.0'
+    id 'java'
+}
+
+group = 'com.java_spring_exception_han'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa" //NOTE: Provides the CrudRepository API we use in our repositories to generate SQL for us using JPA. Docs: https://spring.io/guides/gs/accessing-data-jpa/
+    implementation "org.springframework.boot:spring-boot-starter-web" //NOTE: Starter of Spring web uses Spring MVC, REST and Tomcat as a default embedded server. When we run our application on our local machine - this is the server that makes it possible. Docs: https://www.javatpoint.com/spring-boot-starter-web
+    implementation "org.springframework.boot:spring-boot-starter-actuator" //NOTE: Actuator is mainly used to expose operational information about the running application — health, metrics, info, dump, env, etc. It uses HTTP endpoints or JMX beans to enable us to interact with it. Docs: https://www.baeldung.com/spring-boot-actuators
+    implementation "org.springdoc:springdoc-openapi-ui:1.2.24" //NOTE: For swagger-ui
+    implementation "javax.validation:validation-api:2.0.0.Final" //NOTE: Adds sql validation annotations we can use on our entities. Docs: https://www.baeldung.com/javax-validation
+    implementation 'org.projectlombok:lombok:1.16.16' //NOTE: Auto-generates constructors, getters, and setters for Java model classes using annotations
+    implementation 'org.modelmapper:modelmapper:2.3.5' //NOTE: Maps objects of one class to another class
+
+    runtime "org.springframework.boot:spring-boot-devtools" //NOTE: The aim of the module is to try and improve the development time while working with the Spring Boot application. Spring Boot DevTools pick up the changes and restart the application. Docs: https://www.javatpoint.com/spring-boot-devtools
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test" //NOTE: Needed for juniper java unit testing framework
+    testImplementation "org.mockito:mockito-junit-jupiter:3.0.0" //NOTE: Java unit testing framework
+    testImplementation "org.mockito:mockito-core:3.0.0"  //NOTE: Java unit testing framework
+}
+
+test {
+    useJUnitPlatform() //NOTE: Used to run our tests
+}
