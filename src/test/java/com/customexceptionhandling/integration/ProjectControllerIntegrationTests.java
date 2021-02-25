@@ -9,12 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// NOTE: Update active profile to reflect your operating system to connect to database
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = SpringCommandLineProfileResolver.class)
 public class ProjectControllerIntegrationTests {
@@ -25,16 +26,16 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void successEndpoint_validInput_200Success() {
-        String response = testRestTemplate.getForObject("/project/success", String.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/success", HttpMethod.GET, null, String.class);
 
-        assertNotNull(response);
-        assertEquals(Constants.SUCCESS, response);
+        assertNotNull(response.getBody());
+        assertEquals(Constants.SUCCESS, response.getBody());
     }
 
     @Test
     void badRequestEndpoint_validInput_400BadRequest() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/badrequest", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/badrequest", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
         String expectedDetailedErrorMsg = Constants.PROJECT_MUST_HAVE_NAME + Constants.PROJECT_MUST_HAVE_DESCRIPTION + Constants.PROJECT_MUST_HAVE_START_DATE;
 
         assertNotNull(response);
@@ -45,8 +46,8 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void unauthorizedEndpoint_validInput_401Unauthorized() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/unauthorized", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/unauthorized", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
@@ -56,8 +57,8 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void forbiddenEndpoint_validInput_403Forbidden() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/forbidden", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/forbidden", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
@@ -67,8 +68,8 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void notFoundEndpoint_validInput_404NotFound() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/notfound", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/notfound", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
@@ -77,9 +78,9 @@ public class ProjectControllerIntegrationTests {
     }
 
     @Test
-    void conflictEndpoint_validInput_404NotFound() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/conflict", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+    void conflictEndpoint_validInput_409Conflict() throws JsonProcessingException {
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/conflict", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
@@ -89,8 +90,8 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void internalServerErrorEndpoint_validInput_500InternalServerError() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/internalservererror", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/internalservererror", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
@@ -100,8 +101,8 @@ public class ProjectControllerIntegrationTests {
 
     @Test
     void serviceUnavailableEndpoint_validInput_500ServiceUnavailable() throws JsonProcessingException {
-        String response = testRestTemplate.getForObject("/project/serviceunavailable", String.class);
-        ErrorResponseModel errorResponse = this.objectMapper.readValue(response, ErrorResponseModel.class);
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/serviceunavailable", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
 
         assertNotNull(response);
         assertNotNull(errorResponse.getDate());
