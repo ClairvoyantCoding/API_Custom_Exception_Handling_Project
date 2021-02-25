@@ -10,7 +10,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponseModel {
-    private Date date;
+    private int statusCode;
+    private String date;
     private String restErrorMessage;
     private String detailedErrorMessage;
 }

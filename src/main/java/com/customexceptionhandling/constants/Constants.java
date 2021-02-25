@@ -6,7 +6,6 @@ import java.util.Date;
 
 public final class Constants {
     // Project Statuses
-    public static final String TODO_STATUS = "TO_DO";
     public static final String SUCCESS = "Success";
 
     // Rest Error Messages

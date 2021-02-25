@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @ControllerAdvice
 public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger logger;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
     public ControllerAdviceExceptionHandler(Logger logger) {
         this.logger = logger;
@@ -32,7 +34,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_BAD_REQUEST, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                400,
+                dateFormat.format(new Date()),
                 Constants.REST_BAD_REQUEST,
                 Constants.INVALID_JSON);
 
@@ -44,7 +47,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_BAD_REQUEST, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                400,
+                dateFormat.format(new Date()),
                 Constants.REST_BAD_REQUEST,
                 ex.getMessage());
 
@@ -56,7 +60,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_UNAUTHORIZED, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                401,
+                dateFormat.format(new Date()),
                 Constants.REST_UNAUTHORIZED,
                 ex.getMessage());
 
@@ -68,7 +73,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_FORBIDDEN, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                403,
+                dateFormat.format(new Date()),
                 Constants.REST_FORBIDDEN,
                 ex.getMessage());
 
@@ -80,7 +86,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_NOT_FOUND, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                404,
+                dateFormat.format(new Date()),
                 Constants.REST_NOT_FOUND,
                 ex.getMessage());
 
@@ -92,21 +99,21 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.error(Constants.REST_CONFLICT, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                409,
+                dateFormat.format(new Date()),
                 Constants.REST_CONFLICT,
                 ex.getMessage());
 
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 
-    // IMPORTANT NOTE: This also covers invalid UUIDs sent as path parameters which
-    //  causes an internal server error that I translate to a Bad Request
     @ExceptionHandler(value = { InternalServerErrorException.class, RuntimeException.class })
     protected ResponseEntity<ErrorResponseModel> handleInternalServerError(Exception ex) {
         logger.info(Constants.REST_INTERNAL_SERVER_ERROR, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                500,
+                dateFormat.format(new Date()),
                 Constants.REST_INTERNAL_SERVER_ERROR,
                 ex.getMessage());
 
@@ -118,7 +125,8 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
         logger.info(Constants.REST_SERVICE_UNAVAILABLE, ex);
 
         ErrorResponseModel errorDetails = new ErrorResponseModel(
-                new Date(),
+                503,
+                dateFormat.format(new Date()),
                 Constants.REST_SERVICE_UNAVAILABLE,
                 ex.getMessage());
 
