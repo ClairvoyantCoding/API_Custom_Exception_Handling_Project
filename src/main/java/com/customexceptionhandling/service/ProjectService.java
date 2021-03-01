@@ -1,6 +1,8 @@
 package com.customexceptionhandling.service;
 
+import com.customexceptionhandling.dao.ProjectDAO;
 import com.customexceptionhandling.error.restCustomExceptions.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -10,10 +12,15 @@ import static com.customexceptionhandling.constants.Constants.*;
 
 @Service
 public class ProjectService {
-    public ProjectService() { }
+    @Autowired
+    private final ProjectDAO projectDAO;
+
+    public ProjectService(ProjectDAO projectDAO) {
+        this.projectDAO = projectDAO;
+    }
 
     public String succeed() {
-        return SUCCESS;
+        return this.projectDAO.getProject(true);
     }
 
     public String badRequest() {
