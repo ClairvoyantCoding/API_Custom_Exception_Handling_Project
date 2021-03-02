@@ -100,9 +100,123 @@ You can see all of this in action and check out the other types of exceptions by
 
 You will not be able to access the project logs but the pictures I've included here should suffice.
 
-## Facilitating Our Unit & Integration Testing
+## Unit Testing
 
+In our unit tests our goal is to test as much of our business logic as possible in a metric called **Code Coverage** that is expressed as a percentage. We test each service and controller in the project and write a test for each unique way our code could fail or succeed. Since we're testing each controller and service individually, we need to account for the dependencies of each of these controllers and services. We do this by mocking each of the dependencies our controllers and services need to run.
 
+For example, the **ProjectService** depends on the **ProjectDAO** in order to perform its job. As you can see in the test below, we create a projectDAO and set it equal to the result of our org.mockito.Mockito.mock function call. Then, when we create our projectService instance we inject the mock. 
+
+**We do not call the "real" methods of our mocked dependencies**. We instead force our dependencies to return what we want using a **Mockito when()** statement. In our first test, we say that whenever the *projectDAO.getProject()* method is invoked with the argument **true**, the result will be a String SUCCESS message. After our whenever statement, we call the projectService.succeed() method, which will call the *projectDAO.getProject()* method with a value of true, which our mocking will force that function to return "Constants.Success". The actual *projectDAO.getProject()* is never called since we mocked it - so if you put a breakpoint in that method it would never be hit. 
+
+We can force successful returns and we can also force exceptions to be thrown from our dependency calls using mocking. In our second test case we force the same *projectDAO.getProject()* to throw a BadRequestException. Then when it's called, it will force that to happen. This allows us to test that the projectService will behave in the correct way when it encounters this kind of exception.
+
+```java
+@ExtendWith(MockitoExtension.class)
+public class ProjectServiceUnitTests {
+    private final ProjectDAO projectDAO = mock(ProjectDAO.class);
+
+    private final ProjectService projectService = new ProjectService(projectDAO);
+
+    @Test
+    void success_validInput_200Okay() {
+        when(projectDAO.getProject(true))
+                .thenReturn(Constants.SUCCESS);
+
+        String response = projectService.succeed();
+
+        assertNotNull(response);
+        assertEquals(Constants.SUCCESS, response);
+    }
+
+    @Test
+    void success_invalidInput_400BadRequest() {
+        BadRequestException ex = new BadRequestException(Constants.REST_BAD_REQUEST, null);
+
+        when(projectDAO.getProject(true)).thenThrow(ex);
+
+        BadRequestException response = assertThrows(BadRequestException.class, projectService::succeed);
+
+        assertNotNull(response);
+        assertEquals(Constants.REST_BAD_REQUEST, response.getMessage());
+    }
+}
+```
+
+## Integration Testing
+
+The last topic I'll cover is integration testing. Integration testing does not use mocking at all. It will actually spin up the app on your local machine, and test your endpoints with real data and then validate that the correct response comes back in each case. We can use the *TestRestTemplate* class as our HTTP Client, and an ObjectMapper class to map the ResponseEntity we receive back from our endpoints into a DTO. 
+
+We can call the *testRestTemplate.exchange()* method with the path to the endpoint we want to hit, the HttpMethod we are calling with, the request body, and the expected response class. The success() endpoint only returns a single string, so we don't need to map the response into a class. The BadRequest test returns an ErrorResponseModel that we can map our response to with the ObjectMapper.
+
+Then we validate that the responses are what we want in the last step of our test. 
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(resolver = SpringCommandLineProfileResolver.class)
+public class ProjectControllerIntegrationTests {
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    void successEndpoint_validInput_200Success() {
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/success", HttpMethod.GET, null, String.class);
+
+        assertNotNull(response.getBody());
+        assertEquals(Constants.SUCCESS, response.getBody());
+    }
+
+    @Test
+    void badRequestEndpoint_validInput_400BadRequest() throws JsonProcessingException {
+        ResponseEntity<String> response = testRestTemplate.exchange("/project/badrequest", HttpMethod.GET, null, String.class);
+        ErrorResponseModel errorResponse = this.objectMapper.readValue(response.getBody(), ErrorResponseModel.class);
+        String expectedDetailedErrorMsg = Constants.PROJECT_MUST_HAVE_NAME + Constants.PROJECT_MUST_HAVE_DESCRIPTION + Constants.PROJECT_MUST_HAVE_START_DATE;
+
+        assertNotNull(response);
+        assertNotNull(errorResponse.getDate());
+        assertEquals(Constants.REST_BAD_REQUEST, errorResponse.getRestErrorMessage());
+        assertEquals(expectedDetailedErrorMsg, errorResponse.getDetailedErrorMessage());
+    }
+```
+
+## Testing Conventions
+
+### Tests Document Business Rules
+
+Each test exists as a living document of a business rule. Example business rule: When you try to get a project that does not exist, return a "Not Found" error to the user. In addition to documenting the business rules, the test exists to ensure that new work does not break old code. If we create a new feature that we didn't anticipate would impact an existing feature, our test breaking will be what saves us from pushing broken code to prod. 
+
+### Test Naming Convention
+
+In order to make our tests as easy to understand, we can name them using the convention: **{method being tested}_{description of input}_{description of result}**. For example: **registerUser_validUserInput_201Created**. Without reading any code within this function, we can immediately understand what function is being tested, what input is provided, and the expected result.
+
+> NOTE: I used "registerUser" to define the function being tested without providing if it is the controller, the service, or the dao that is being tested. This is okay because we create unique testing classes for each controller and service, so you would know what class the function belongs to based on the file you're in. 
+
+### Triple "A" Test Structure
+
+Tests can get very messy if you have more than one dependency, or complex input to your test, or tons of setup to do so that your test will work. That's why it's important that we follow a convention for structuring tests. The most popular one I have used is **Triple A**. Triple "A" stands for: 
+
+- Assemble
+- Act
+- Assert
+
+The idea is that each of our tests should have three sections. The first is the **Assemble** section where we create our input data and setup our mocking **when()** statements and any response or error objects we want our test to return or throw. The second section is our **Act** section where we actually call the method we are going to be testing and save the result. Lastly, in our **Assert** section we validate that the respone we got is the correct one. Following this pattern will keep our tests clean. Example:
+
+```java
+    @Test
+    void success_invalidInput_400BadRequest() {
+        // assemble
+        BadRequestException ex = new BadRequestException(Constants.REST_BAD_REQUEST, null);
+        when(projectDAO.getProject(true)).thenThrow(ex);
+    
+        // act
+        BadRequestException response = assertThrows(BadRequestException.class, projectService::succeed);
+
+        // assert
+        assertNotNull(response);
+        assertEquals(Constants.REST_BAD_REQUEST, response.getMessage());
+    }
+```
 
 ***
 
@@ -112,5 +226,7 @@ In this article I cover:
 - Utilizing logging to persist the ugly error messages you wouldn't want users to see
 - Using Controller Advice on a Spring Controller to catch the errors thrown by incoming requests
 - Effective utilization of a global constant file
+- Unit testing using juniper
+- Integration testing
 
 In this project I'll use Java 11, but this code should run in Java 8 with very little modification. It could also be ported over to Kotlin fairly easily as well.
