@@ -1,8 +1,9 @@
 package com.customexceptionhandling.service;
 
 import com.customexceptionhandling.constant.Constants;
-import com.customexceptionhandling.dao.ProjectDAO;
+import com.customexceptionhandling.dao.impl.ProjectDAO;
 import com.customexceptionhandling.error.restCustomExceptions.BadRequestException;
+import com.customexceptionhandling.service.impl.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

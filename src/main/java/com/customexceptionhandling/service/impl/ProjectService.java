@@ -1,7 +1,8 @@
-package com.customexceptionhandling.service;
+package com.customexceptionhandling.service.impl;
 
-import com.customexceptionhandling.dao.ProjectDAO;
+import com.customexceptionhandling.dao.impl.ProjectDAO;
 import com.customexceptionhandling.error.restCustomExceptions.*;
+import com.customexceptionhandling.service.ProjectServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
 import static com.customexceptionhandling.constant.Constants.*;
 
 @Service
-public class ProjectService {
+public class ProjectService implements ProjectServiceI {
     @Autowired
     private final ProjectDAO projectDAO;
 

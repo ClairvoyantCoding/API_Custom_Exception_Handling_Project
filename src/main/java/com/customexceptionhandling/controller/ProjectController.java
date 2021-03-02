@@ -1,6 +1,6 @@
 package com.customexceptionhandling.controller;
 
-import com.customexceptionhandling.service.ProjectService;
+import com.customexceptionhandling.service.impl.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
