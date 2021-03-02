@@ -2,7 +2,7 @@ package com.customexceptionhandling.integration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.customexceptionhandling.constants.Constants;
+import com.customexceptionhandling.constant.Constants;
 import com.customexceptionhandling.error.ErrorResponseModel;
 import com.customexceptionhandling.util.SpringCommandLineProfileResolver;
 import org.junit.jupiter.api.Test;

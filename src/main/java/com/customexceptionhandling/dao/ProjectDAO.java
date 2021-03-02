@@ -1,6 +1,6 @@
 package com.customexceptionhandling.dao;
 
-import com.customexceptionhandling.constants.Constants;
+import com.customexceptionhandling.constant.Constants;
 import com.customexceptionhandling.error.restCustomExceptions.BadRequestException;
 import org.springframework.stereotype.Service;
 

@@ -110,6 +110,10 @@ For example, the **ProjectService** depends on the **ProjectDAO** in order to pe
 
 We can force successful returns and we can also force exceptions to be thrown from our dependency calls using mocking. In our second test case we force the same *projectDAO.getProject()* to throw a BadRequestException. Then when it's called, it will force that to happen. This allows us to test that the projectService will behave in the correct way when it encounters this kind of exception.
 
+After we get a response from the method we are testing, we can use a Mockito **verify()** statement to verify that our method was called the correct number of times. Especially if we configure retry logic, the verify method will be very importent in ensuring our code is behavign how we expect.
+
+After our verifys, we then assert that the values we got in our response are correct.
+
 ```java
 @ExtendWith(MockitoExtension.class)
 public class ProjectServiceUnitTests {
@@ -123,6 +127,8 @@ public class ProjectServiceUnitTests {
                 .thenReturn(Constants.SUCCESS);
 
         String response = projectService.succeed();
+        
+        verify(projectDAO).getProject(true);
 
         assertNotNull(response);
         assertEquals(Constants.SUCCESS, response);
@@ -135,6 +141,8 @@ public class ProjectServiceUnitTests {
         when(projectDAO.getProject(true)).thenThrow(ex);
 
         BadRequestException response = assertThrows(BadRequestException.class, projectService::succeed);
+
+        verify(projectDAO).getProject(true);
 
         assertNotNull(response);
         assertEquals(Constants.REST_BAD_REQUEST, response.getMessage());
@@ -213,6 +221,8 @@ The idea is that each of our tests should have three sections. The first is the 
         BadRequestException response = assertThrows(BadRequestException.class, projectService::succeed);
 
         // assert
+        verify(projectDAO).getProject(true);
+
         assertNotNull(response);
         assertEquals(Constants.REST_BAD_REQUEST, response.getMessage());
     }

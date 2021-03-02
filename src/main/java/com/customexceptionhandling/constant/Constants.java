@@ -1,6 +1,6 @@
-package com.customexceptionhandling.constants;
+package com.customexceptionhandling.constant;
 
-import com.customexceptionhandling.models.ProjectDto;
+import com.customexceptionhandling.model.ProjectDto;
 
 import java.util.Date;
 

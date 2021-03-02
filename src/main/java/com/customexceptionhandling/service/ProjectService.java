@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static com.customexceptionhandling.constants.Constants.*;
+import static com.customexceptionhandling.constant.Constants.*;
 
 @Service
 public class ProjectService {

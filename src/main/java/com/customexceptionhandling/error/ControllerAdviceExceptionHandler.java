@@ -1,6 +1,6 @@
 package com.customexceptionhandling.error;
 
-import com.customexceptionhandling.constants.Constants;
+import com.customexceptionhandling.constant.Constants;
 import com.customexceptionhandling.error.restCustomExceptions.*;
 import org.slf4j.Logger;
 import org.springframework.http.HttpHeaders;

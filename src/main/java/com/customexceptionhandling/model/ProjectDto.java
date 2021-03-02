@@ -1,4 +1,4 @@
-package com.customexceptionhandling.models;
+package com.customexceptionhandling.model;
 
 import lombok.Data;
 import java.util.Date;

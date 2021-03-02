@@ -1,8 +1,9 @@
-package com.customexceptionhandling.service;
+package com.customexceptionhandling.controller;
 
 import com.customexceptionhandling.constant.Constants;
 import com.customexceptionhandling.dao.ProjectDAO;
 import com.customexceptionhandling.error.restCustomExceptions.BadRequestException;
+import com.customexceptionhandling.service.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,33 +12,33 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectServiceUnitTests {
-    private final ProjectDAO projectDAO = mock(ProjectDAO.class);
+public class ControllerUnitTests {
+    private final ProjectService projectService = mock(ProjectService.class);
 
-    private final ProjectService projectService = new ProjectService(projectDAO);
+    private final ProjectController projectController = new ProjectController(projectService);
 
     @Test
     void success_validInput_200Okay() {
-        when(projectDAO.getProject(true))
+        when(projectService.succeed())
                 .thenReturn(Constants.SUCCESS);
 
         String response = projectService.succeed();
 
-        verify(projectDAO).getProject(true);
+        verify(projectService).succeed();
 
         assertNotNull(response);
         assertEquals(Constants.SUCCESS, response);
     }
 
     @Test
-    void success_invalidInput_400BadRequest() {
+    void badRequest_invalidInput_400BadRequest() {
         BadRequestException ex = new BadRequestException(Constants.REST_BAD_REQUEST, null);
 
-        when(projectDAO.getProject(true)).thenThrow(ex);
+        when(projectService.badRequest()).thenThrow(ex);
 
-        BadRequestException response = assertThrows(BadRequestException.class, projectService::succeed);
+        BadRequestException response = assertThrows(BadRequestException.class, projectController::badRequest);
 
-        verify(projectDAO).getProject(true);
+        verify(projectService).badRequest();
 
         assertNotNull(response);
         assertEquals(Constants.REST_BAD_REQUEST, response.getMessage());
